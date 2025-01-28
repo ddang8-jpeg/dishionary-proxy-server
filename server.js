@@ -1,12 +1,9 @@
 const express = require("express");
-const multer = require("multer");
 const dotenv = require("dotenv");
-const path = require("path");
 const cors = require("cors");
 const helmet = require("helmet");
-const { initializeClient } = require("./azureClient");
-const { analyzeImage } = require("./routes/analyzeImage");
-const { validateFile } = require("./middleware/validateFile");
+const azureRouter = require("./routes/azureRouter");
+const googleRouter = require("./routes/googleRouter");
 
 dotenv.config();
 
@@ -15,9 +12,8 @@ const PORT = process.env.PORT || 3000;
 
 // Use CORS middleware
 app.use(
-  cors({
-    origin: "http://localhost:8081", // Only allow requests from this origin for testing
-  })
+  cors()
+  //{origin: "http://localhost:8081", // Only allow requests from this origin for testing}
 );
 
 // Security middleware
@@ -26,20 +22,11 @@ app.use(helmet());
 // Parse JSON bodies
 app.use(express.json());
 
-// Multer file upload setup (store in memory)
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
-// Initialize Azure Vision client
-const client = initializeClient();
-
 // Route to handle Azure Vision API requests
-app.post(
-  "/analyze-image",
-  upload.single("image"),
-  validateFile,
-  analyzeImage(client)
-);
+app.use("/azure", azureRouter);
+
+// Route to handle Google Custom Search API request
+app.use("/google", googleRouter);
 
 // Start the server
 app.listen(PORT, () => {
