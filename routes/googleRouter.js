@@ -10,6 +10,7 @@ router.get(
     const key = process.env["GOOGLE_SEARCH_KEY"];
     const id = process.env["GOOGLE_SEARCH_ENGINE_ID"];
     const url = process.env["GOOGLE_SEARCH_ENDPOINT"];
+    const query = req.query.q;
 
     const response = await axios.get(url, {
       params: {
